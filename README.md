@@ -374,12 +374,12 @@ DELIMITER $$
 DROP PROCEDURE IF EXISTS ActualizarPrecioProducto;
 CREATE PROCEDURE ActualizarPrecioProducto(
 	IN p_id_producto INT,
-    IN p_precio DOUBLE
+    	IN p_precio DOUBLE
 	)
 
 BEGIN
 	UPDATE Productos
-    SET precio = p_precio
+    	SET precio = p_precio
 	WHERE id_producto = p_id_producto;
 END $$
 
