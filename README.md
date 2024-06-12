@@ -1,5 +1,7 @@
 # Filtro_ConsultasSQL
 
+Este documento contiene las consultas para la base de datos para la tienda en linea "TECH HAVEN"
+
 1. Obtener la lista de todos los productos con sus precio
 ~~~mysql
 SELECT nombre, precio
