@@ -32,10 +32,10 @@ FROM Productos;
 2. Encontrar todos los pedidos realizados por un usuario específico, por ejemplo, Juan Perez
 
 ~~~mysql
-SELECT p.id_pedido AS 'ID pedido', p.fecha, p.total
+SELECT p.id AS 'ID pedido', p.fecha, p.total
 FROM Usuarios AS u
 INNER JOIN Pedidos AS p
-ON u.id_usuario = p.id_usuario
+ON u.id = p.id_usuario
 WHERE u.nombre = 'Juan Perez';
 
 
@@ -55,7 +55,7 @@ unitario
 SELECT dp.id_pedido, pr.nombre, dp.cantidad, dp.precio_unitario
 FROM DetallesPedidos AS dp
 INNER JOIN Productos AS pr
-ON dp.id_producto = pr.id_producto;
+ON dp.id_producto = pr.id;
 
 +-----------+-------------------------+----------+-----------------+
 | id_pedido | nombre                  | cantidad | precio_unitario |
@@ -79,8 +79,8 @@ ON dp.id_producto = pr.id_producto;
 SELECT u.nombre, SUM(p.total) AS total_gastado
 FROM Usuarios AS u
 INNER JOIN Pedidos AS p
-ON u.id_usuario = p.id_usuario
-GROUP BY u.id_usuario;
+ON u.id = p.id_usuario
+GROUP BY u.id;
 
 +----------------+---------------+
 | nombre         | total_gastado |
@@ -112,7 +112,7 @@ WHERE precio > 500;
 
 6. Listar los pedidos realizados en una fecha específica, por ejemplo, 2024-03-10
 ~~~mysql
-SELECT id_pedido, id_usuario, fecha, total
+SELECT id, id_usuario, fecha, total
 FROM Pedidos
 WHERE fecha = '2024-03-10';
 
@@ -128,9 +128,8 @@ WHERE fecha = '2024-03-10';
 SELECT u.nombre, COUNT(p.id_usuario) AS numero_pedidos
 FROM Usuarios AS u
 INNER JOIN Pedidos AS p
-ON u.id_usuario = p.id_usuario
-GROUP BY u.id_usuario;
-
+ON u.id = p.id_usuario
+GROUP BY u.id;
 +----------------+----------------+
 | nombre         | numero_pedidos |
 +----------------+----------------+
@@ -148,7 +147,7 @@ GROUP BY u.id_usuario;
 SELECT pr.nombre, SUM(dp.cantidad) AS cantidad_total
 FROM Productos AS pr
 INNER JOIN DetallesPedidos AS dp
-ON pr.id_producto = dp.id_producto
+ON pr.id= dp.id_producto
 GROUP BY dp.id_producto
 ORDER BY cantidad_total DESC
 LIMIT 1;
@@ -165,7 +164,7 @@ LIMIT 1;
 SELECT u.nombre, u.correo_electronico
 FROM Usuarios AS u
 LEFT JOIN Pedidos AS p
-ON u.id_usuario = p.id_usuario
+ON u.id = p.id_usuario
 WHERE p.id_usuario IS NOT NULL;
 
 +----------------+----------------------------+
@@ -184,15 +183,15 @@ WHERE p.id_usuario IS NOT NULL;
 ejemplo, pedido con id 1
 
 ~~~mysql
-SELECT p.id_pedido, u.nombre AS usuario, pr.nombre AS producto, dp.cantidad, dp.precio_unitario
+SELECT p.id, u.nombre AS usuario, pr.nombre AS producto, dp.cantidad, dp.precio_unitario
 FROM Usuarios AS u
 INNER JOIN Pedidos AS p
-ON u.id_usuario = p.id_usuario
+ON u.id = p.id_usuario
 INNER JOIN DetallesPedidos AS dp
-ON p.id_pedido = dp.id_pedido
+ON p.id = dp.id_pedido
 INNER JOIN Productos AS pr
-ON dp.id_producto = pr.id_producto
-WHERE p.id_pedido = 1;
+ON dp.id_producto = pr.id
+WHERE p.id = 1;
 
 +-----------+------------+-----------------+----------+-----------------+
 | id_pedido | usuario    | producto        | cantidad | precio_unitario |
@@ -210,8 +209,8 @@ Subconsultas
 SELECT u.nombre, SUM(p.total) AS total_gastado
 FROM Usuarios AS u
 INNER JOIN Pedidos AS p
-ON u.id_usuario = p.id_usuario
-GROUP BY u.id_usuario
+ON u.id = p.id_usuario
+GROUP BY u.id
 ORDER BY total_gastado DESC
 LIMIT 1;
 
@@ -230,7 +229,7 @@ LIMIT 1;
 SELECT pr.nombre
 FROM Productos AS pr
 INNER JOIN DetallesPedidos AS dp
-ON pr.id_producto = dp.id_producto
+ON pr.id = dp.id_producto
 WHERE dp.id_producto IN (SELECT id_producto FROM DetallesPedidos);
 
 
@@ -255,9 +254,10 @@ WHERE dp.id_producto IN (SELECT id_producto FROM DetallesPedidos);
 3. Obtener los detalles del pedido con el total más alto
 
 ~~~mysql
-SELECT id_pedido, id_usuario, fecha, total
+SELECT id, id_usuario, fecha, total
 FROM Pedidos 
 WHERE total = (SELECT MAX(total) FROM Pedidos);
+
 
 +-----------+------------+------------+---------+
 | id_pedido | id_usuario | fecha      | total   |
@@ -272,8 +272,8 @@ WHERE total = (SELECT MAX(total) FROM Pedidos);
 SELECT u.nombre, COUNT(p.id_usuario) AS numero_pedidos
 FROM Usuarios AS u
 INNER JOIN Pedidos AS p
-ON u.id_usuario = p.id_usuario
-GROUP BY u.id_usuario
+ON u.id = p.id_usuario
+GROUP BY u.id
 WHERE COUNT(p.id_usuario) > 1;
 
 ~~~
@@ -287,8 +287,9 @@ WHERE COUNT(p.id_usuario) > 1;
 SELECT pr.nombre, pr.precio 
 FROM Productos AS pr
 INNER JOIN DetallesPedidos AS dp
-ON pr.id_producto = dp.id_producto
+ON pr.id = dp.id_producto
 WHERE pr.precio = (SELECT MAX(precio_unitario) FROM DetallesPedidos);
+
 
 
 +-------------+---------+
@@ -328,7 +329,7 @@ DELIMITER;
 
 
 2.Crear un procedimiento almacenado para obtener los detalles de un pedido
-Enunciado: Crea un procedimiento almacenado llamado ActualizarPrecioProducto que reciba
+Enunciado: Crea un procedimiento almacenado llamado ObtenerDetallesPedido que reciba
 como parámetro el ID del pedido y devuelva los detalles del pedido, incluyendo el nombre del
 producto, cantidad y precio unitario.
 
@@ -336,8 +337,8 @@ producto, cantidad y precio unitario.
 
 DELIMITER $$
 
-DROP PROCEDURE IF EXISTS ActualizarPrecioProducto;
-CREATE PROCEDURE ActualizarPrecioProducto(
+DROP PROCEDURE IF EXISTS ObtenerDetallesPedido;
+CREATE PROCEDURE ObtenerDetallesPedido(
 	IN p_id_pedido INT
 	)
 
@@ -345,13 +346,13 @@ BEGIN
 	SELECT dp.id_pedido, pr.nombre AS nombreProducto, dp.cantidad, dp.precio_unitario
 	FROM DetallesPedidos AS dp
 	INNER JOIN Productos AS pr
-	ON dp.id_producto = pr.id_producto
+	ON dp.id_producto = pr.id
 	WHERE id_pedido = p_id_pedido;
 END $$
 
 DELIMITER ;
 
-CALL ActualizarPrecioProducto(3);
+CALL ObtenerDetallesPedido(3);
 
 +-----------+----------------------+----------+-----------------+
 | id_pedido | nombreProducto       | cantidad | precio_unitario |
@@ -374,13 +375,13 @@ DELIMITER $$
 DROP PROCEDURE IF EXISTS ActualizarPrecioProducto;
 CREATE PROCEDURE ActualizarPrecioProducto(
 	IN p_id_producto INT,
-    	IN p_precio DOUBLE
+    IN p_precio DOUBLE
 	)
 
 BEGIN
 	UPDATE Productos
-    	SET precio = p_precio
-	WHERE id_producto = p_id_producto;
+    SET precio = p_precio
+	WHERE id = p_id_producto;
 END $$
 
 DELIMITER ;
@@ -395,20 +396,17 @@ parámetro el ID del producto y lo elimine de la tabla Productos .
 
 ~~~mysql
 DELIMITER $$
-
 DROP PROCEDURE IF EXISTS EliminarProducto;
 CREATE PROCEDURE EliminarProducto(
-	IN p_id_producto INT,
-	)
-
+    IN p_id_producto INT
+)
 BEGIN
 	DELETE FROM Productos
-    WHERE id_producto = p_id_producto
+	WHERE id= p_id_producto;
 END $$
-
 DELIMITER ;
 
-CALL EliminarProducto(5);
+CALL EliminarProducto(2);
 
 ~~~
 
@@ -430,9 +428,9 @@ BEGIN
     SELECT u.nombre, SUM(p.total) AS total_gastado
     FROM Usuarios AS u
     INNER JOIN Pedidos AS p
-    ON u.id_usuario = p.id_usuario
-    WHERE u.id_usuario = p_id_usuario
-    GROUP BY u.id_usuario;
+    ON u.id = p.id_usuario
+    WHERE u.id = p_id_usuario
+    GROUP BY u.id;
 	
 END $$
 
