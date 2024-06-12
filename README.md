@@ -6,6 +6,26 @@ Este documento contiene las consultas para la base de datos para la tienda en li
 ~~~mysql
 SELECT nombre, precio
 FROM Productos;
+
+
++-------------------------+---------+
+| nombre                  | precio  |
++-------------------------+---------+
+| iPhone 13               |  799.99 |
+| Samsung Galaxy S21      |  699.99 |
+| Sony WH-1000XM4         |  349.99 |
+| MacBook Pro             | 1299.99 |
+| Dell XPS 13             |  999.99 |
+| GoPro HERO9             |  399.99 |
+| Amazon Echo Dot         |   49.99 |
+| Kindle Paperwhite       |  129.99 |
+| Apple Watch Series 7    |  399.99 |
+| Bose QuietComfort 35 II |  299.99 |
+| Nintendo Switch         |  299.99 |
+| Fitbit Charge 5         |  179.95 |
+| Nintendo Wii            |  499.95 |
++-------------------------+---------+
+
 ~~~
 
 
