@@ -269,12 +269,12 @@ WHERE total = (SELECT MAX(total) FROM Pedidos);
 4. Listar los usuarios que han realizado más de un pedido
 
 ~~~mysql
-SELECT u.nombre, COUNT(p.id_usuario) AS numero_pedidos
+SELECT u.nombre, u.correo_electronico
 FROM Usuarios AS u
 INNER JOIN Pedidos AS p
 ON u.id = p.id_usuario
 GROUP BY u.id
-WHERE COUNT(p.id_usuario) > 1;
+HAVING COUNT(p.id) > 1;
 
 ~~~
 
