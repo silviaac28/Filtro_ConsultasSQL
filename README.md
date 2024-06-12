@@ -37,6 +37,16 @@ FROM Usuarios AS u
 INNER JOIN Pedidos AS p
 ON u.id_usuario = p.id_usuario
 WHERE u.nombre = 'Juan Perez';
+
+
++-----------+------------+---------+
+| ID pedido | fecha      | total   |
++-----------+------------+---------+
+|         1 | 2024-02-25 | 1049.98 |
++-----------+------------+---------+
+
+
+
 ~~~
 
 3. Listar los detalles de todos los pedidos, incluyendo el nombre del producto, cantidad y precio
