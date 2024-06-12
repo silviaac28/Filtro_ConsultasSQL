@@ -1,24 +1,25 @@
 # Filtro_ConsultasSQL
 
 1. Obtener la lista de todos los productos con sus precio
-
+~~~mysql
 SELECT nombre, precio
 FROM Productos;
-
+~~~
 
 
 2. Encontrar todos los pedidos realizados por un usuario específico, por ejemplo, Juan Perez
 
-
+~~~mysql
 SELECT p.id_pedido AS 'ID pedido', p.fecha, p.total
 FROM Usuarios AS u
 INNER JOIN Pedidos AS p
 ON u.id_usuario = p.id_usuario
 WHERE u.nombre = 'Juan Perez';
+~~~
 
 3. Listar los detalles de todos los pedidos, incluyendo el nombre del producto, cantidad y precio
 unitario
-
+~~~mysql
 SELECT dp.id_pedido, pr.nombre, dp.cantidad, dp.precio_unitario
 FROM DetallesPedidos AS dp
 INNER JOIN Productos AS pr
@@ -39,10 +40,10 @@ ON dp.id_producto = pr.id_producto;
 |         5 | Nintendo Switch         |        1 |          299.99 |
 |         6 | GoPro HERO9             |        1 |          399.99 |
 +-----------+-------------------------+----------+-----------------+
-
+~~~
 
 4. Calcular el total gastado por cada usuario en todos sus pedidos
-
+~~~mysql
 SELECT u.nombre, SUM(p.total) AS total_gastado
 FROM Usuarios AS u
 INNER JOIN Pedidos AS p
@@ -59,10 +60,10 @@ GROUP BY u.id_usuario;
 | Luis Torres    |        699.99 |
 | Laura Rivera   |        399.99 |
 +----------------+---------------+
-
+~~~
 
 5. Encontrar los productos más caros (precio mayor a $500)
-
+~~~mysql
 SELECT nombre, precio
 FROM Productos
 WHERE precio > 500;
@@ -75,10 +76,10 @@ WHERE precio > 500;
 | MacBook Pro        | 1299.99 |
 | Dell XPS 13        |  999.99 |
 +--------------------+---------+
-
+~~~
 
 6. Listar los pedidos realizados en una fecha específica, por ejemplo, 2024-03-10
-
+~~~mysql
 SELECT id_pedido, id_usuario, fecha, total
 FROM Pedidos
 WHERE fecha = '2024-03-10';
@@ -88,10 +89,10 @@ WHERE fecha = '2024-03-10';
 +-----------+------------+------------+---------+
 |         2 |          2 | 2024-03-10 | 1349.98 |
 +-----------+------------+------------+---------+
-
+~~~
 
 7. Obtener el número total de pedidos realizados por cada usuario
-
+~~~mysql
 SELECT u.nombre, COUNT(p.id_usuario) AS numero_pedidos
 FROM Usuarios AS u
 INNER JOIN Pedidos AS p
@@ -108,10 +109,10 @@ GROUP BY u.id_usuario;
 | Luis Torres    |              1 |
 | Laura Rivera   |              1 |
 +----------------+----------------+
-
+~~~
 
 8. Encontrar el nombre del producto más vendido (mayor cantidad total vendida)
-
+~~~mysql
 SELECT pr.nombre, SUM(dp.cantidad) AS cantidad_total
 FROM Productos AS pr
 INNER JOIN DetallesPedidos AS dp
@@ -125,10 +126,10 @@ LIMIT 1;
 +-----------------+----------------+
 | Amazon Echo Dot |              5 |
 +-----------------+----------------+
-
+~~~
 
 9. Listar todos los usuarios que han realizado al menos un pedido
-
+~~~mysql
 SELECT u.nombre, u.correo_electronico
 FROM Usuarios AS u
 LEFT JOIN Pedidos AS p
@@ -145,12 +146,12 @@ WHERE p.id_usuario IS NOT NULL;
 | Luis Torres    | luis.torres@example.com    |
 | Laura Rivera   | laura.rivera@example.com   |
 +----------------+----------------------------+
-
+~~~
 
 10. Obtener los detalles de un pedido específico, incluyendo los productos y cantidades, por
 ejemplo, pedido con id 1
 
-
+~~~mysql
 SELECT p.id_pedido, u.nombre AS usuario, pr.nombre AS producto, dp.cantidad, dp.precio_unitario
 FROM Usuarios AS u
 INNER JOIN Pedidos AS p
@@ -167,13 +168,13 @@ WHERE p.id_pedido = 1;
 |         1 | Juan Perez | iPhone 13       |        1 |          799.99 |
 |         1 | Juan Perez | Amazon Echo Dot |        5 |           49.99 |
 +-----------+------------+-----------------+----------+-----------------+
-
+~~~
 
 Subconsultas
 
 1. Encontrar el nombre del usuario que ha gastado más en total
 
-
+~~~mysql
 SELECT u.nombre, SUM(p.total) AS total_gastado
 FROM Usuarios AS u
 INNER JOIN Pedidos AS p
@@ -187,12 +188,13 @@ LIMIT 1;
 +-------------+---------------+
 | Maria Lopez |       1349.98 |
 +-------------+---------------+
+~~~
 
 
 
 2. Listar los productos que han sido pedidos al menos una vez
 
-
+~~~mysql
 SELECT pr.nombre
 FROM Productos AS pr
 INNER JOIN DetallesPedidos AS dp
@@ -215,12 +217,12 @@ WHERE dp.id_producto IN (SELECT id_producto FROM DetallesPedidos);
 | Bose QuietComfort 35 II |
 | Nintendo Switch         |
 +-------------------------+
-
+~~~
 
 
 3. Obtener los detalles del pedido con el total más alto
 
-
+~~~mysql
 SELECT id_pedido, id_usuario, fecha, total
 FROM Pedidos 
 WHERE total = (SELECT MAX(total) FROM Pedidos);
@@ -230,11 +232,11 @@ WHERE total = (SELECT MAX(total) FROM Pedidos);
 +-----------+------------+------------+---------+
 |         2 |          2 | 2024-03-10 | 1349.98 |
 +-----------+------------+------------+---------+
-
+~~~
 
 4. Listar los usuarios que han realizado más de un pedido
 
-
+~~~mysql
 SELECT u.nombre, COUNT(p.id_usuario) AS numero_pedidos
 FROM Usuarios AS u
 INNER JOIN Pedidos AS p
@@ -242,14 +244,14 @@ ON u.id_usuario = p.id_usuario
 GROUP BY u.id_usuario
 WHERE COUNT(p.id_usuario) > 1;
 
-
+~~~
 
 
 
 
 
 5. Encontrar el producto más caro que ha sido pedido al menos una vez
-
+~~~mysql
 SELECT pr.nombre, pr.precio 
 FROM Productos AS pr
 INNER JOIN DetallesPedidos AS dp
@@ -263,7 +265,7 @@ WHERE pr.precio = (SELECT MAX(precio_unitario) FROM DetallesPedidos);
 | MacBook Pro | 1299.99 |
 +-------------+---------+
 
-
+~~~
 
 ***************************
 Procedimientos Almacenados
@@ -272,6 +274,8 @@ Enunciado: Crea un procedimiento almacenado llamado AgregarProducto que reciba c
 parámetros el nombre, descripción y precio de un nuevo producto y lo inserte en la tabla
 Productos .
 
+
+~~~mysql
 
 DELIMITER $$
 
@@ -288,13 +292,15 @@ BEGIN
 END $$
 DELIMITER;
 
-
+~~~
 
 
 2.Crear un procedimiento almacenado para obtener los detalles de un pedido
 Enunciado: Crea un procedimiento almacenado llamado ActualizarPrecioProducto que reciba
 como parámetro el ID del pedido y devuelva los detalles del pedido, incluyendo el nombre del
 producto, cantidad y precio unitario.
+
+~~~mysql
 
 DELIMITER $$
 
@@ -322,12 +328,14 @@ CALL ActualizarPrecioProducto(3);
 |         3 | Apple Watch Series 7 |        1 |          399.99 |
 +-----------+----------------------+----------+-----------------+
 
-
+~~~
 
 3. Crear un procedimiento almacenado para actualizar el precio de un producto
 Enunciado: Crea un procedimiento almacenado llamado ActualizarPrecioProducto que reciba
 como parámetros el ID del producto y el nuevo precio, y actualice el precio del producto en la
 tabla Productos .
+
+~~~mysql
 
 DELIMITER $$
 
@@ -347,13 +355,13 @@ DELIMITER ;
 
 CALL ActualizarPrecioProducto(2, 699.99);
 
-
+~~~
 
 4. Crear un procedimiento almacenado para eliminar un producto
 Enunciado: Crea un procedimiento almacenado llamado EliminarProducto que reciba como
 parámetro el ID del producto y lo elimine de la tabla Productos .
 
-
+~~~mysql
 DELIMITER $$
 
 DROP PROCEDURE IF EXISTS EliminarProducto;
@@ -370,13 +378,15 @@ DELIMITER ;
 
 CALL EliminarProducto(5);
 
+~~~
+
 
 5. Crear un procedimiento almacenado para obtener el total gastado por un usuario
 Enunciado: Crea un procedimiento almacenado llamado TotalGastadoPorUsuario que reciba
 como parámetro el ID del usuario y devuelva el total gastado por ese usuario en todos sus
 pedidos.
 
-
+~~~mysql
 DELIMITER $$
 
 DROP PROCEDURE IF EXISTS TotalGastadoPorUsuario;
@@ -397,4 +407,6 @@ END $$
 DELIMITER ;
 
 CALL TotalGastadoPorUsuario(4);
+
+~~~
 
